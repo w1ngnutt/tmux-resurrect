@@ -289,6 +289,14 @@ restore_shell_history() {
 		done
 }
 
+restore_directory_config() {
+        awk 'BEGIN { FS="\t"; OFS="\t" } /^pane/ { print $2, $3, $7, $8; }' $(last_resurrect_file) |
+                while IFS=$d read session_name window_number pane_index dir; do
+                        dir="$(remove_first_char "$dir")"
+                        process_dir_config $"$session_name" "$window_number" "$pane_index" "$dir"
+                done
+}
+
 restore_all_pane_processes() {
 	if restore_pane_processes_enabled; then
 		local pane_full_command
@@ -349,6 +357,7 @@ main() {
 		if save_shell_history_option_on; then
 			restore_shell_history
 		fi
+                restore_directory_config
 		restore_all_pane_processes
 		# below functions restore exact cursor positions
 		restore_active_pane_for_each_window

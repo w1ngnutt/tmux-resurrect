@@ -39,6 +39,18 @@ restore_pane_process() {
 	fi
 }
 
+process_dir_config() {
+	local session_name="$1"
+	local window_number="$2"
+	local pane_index="$3"
+	local dir="$4"
+
+        tmux switch-client -t "${session_name}:${window_number}"
+        tmux select-pane -t "$pane_index"
+        test -f "${dir}/.tmux-restore" && tmux send-keys "source .tmux-restore" "C-m"
+
+}
+
 # private functions below
 
 _process_should_be_restored() {
